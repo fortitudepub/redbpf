@@ -32,7 +32,6 @@ use llvm_sys::core::*;
 use llvm_sys::debuginfo::*;
 use llvm_sys::ir_reader::LLVMParseIRInContext;
 use llvm_sys::prelude::*;
-use llvm_sys::support::LLVMParseCommandLineOptions;
 use llvm_sys::target::*;
 use llvm_sys::target_machine::*;
 use llvm_sys::transforms::ipo::LLVMAddAlwaysInlinerPass;
@@ -52,13 +51,6 @@ pub unsafe fn init() {
     LLVM_InitializeAllTargetMCs();
     LLVM_InitializeAllAsmPrinters();
     LLVM_InitializeAllAsmParsers();
-
-    let mut args = Vec::new();
-    args.push(CString::new("cargo-bpf").unwrap());
-    args.push(CString::new(format!("-unroll-threshold={}", std::u32::MAX)).unwrap());
-    let args_ptrs = args.iter().map(|s| s.as_ptr()).collect::<Vec<_>>();
-    let overview = CString::new("what is this").unwrap();
-    LLVMParseCommandLineOptions(args.len() as i32, args_ptrs.as_ptr(), overview.as_ptr());
 }
 
 unsafe fn load_module(context: LLVMContextRef, input: &Path) -> Result<LLVMModuleRef> {
